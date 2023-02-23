@@ -1,0 +1,115 @@
+﻿using System;
+using System.Data.Linq;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Data.SqlClient;
+
+//namespace Tsqlto_mariadb.Class
+//{
+ public class forgotpunchcard_everyday
+    {
+        public string SelectData_sql()
+        {// sql server
+            string sql = @"
+SELECT
+TMR_QTY_T, SF_CODE, SF_NAME, DF_CODE, DF_DESC, PRS_NO, BR_THAIDESC, DEPT_CODE, DEPT_THAIDESC, EMP_INTL, EMP_NAME, EMP_SURNME, TMR_DATE, BR_CODE, SF_IN_DAY, SF_IN_TIME
+,EMP_KEY,EMP_EMAIL,replace(EMP_TEL,'-','') as EMP_TEL
+FROM
+EMPFILE,
+PERSONALINFO, 
+PAYROLLINFO,
+DEPTTAB, 
+TMRESULT, 
+TMSHIFT, 
+PRDEFTAB ,
+TMTRAN, BRANCH
+WHERE
+(PERSONALINFO.PRS_EMP = PAYROLLINFO.PRI_EMP) AND
+(PERSONALINFO.PRS_EMP = EMPFILE.EMP_KEY) AND
+(PERSONALINFO.PRS_DEPT = DEPTTAB.DEPT_KEY) AND
+(PERSONALINFO.PRS_EMP = TMRESULT.TMR_EMP) AND
+(TMRESULT.TMR_EMP = TMTRAN.TMT_EMP) AND
+(TMRESULT.TMR_SF = TMSHIFT.SF_KEY) AND
+(TMRESULT.TMR_SF = TMTRAN.TMT_SF) AND
+(TMRESULT.TMR_DATE = TMTRAN.TMT_DATE) AND
+(TMRESULT.TMR_DF_T = PRDEFTAB.DF_KEY) AND
+(TMRESULT.TMR_DF_T = PRDEFTAB.DF_KEY) AND
+    (((PRDEFTAB.DF_CODE >= 2120) AND
+      (PRDEFTAB.DF_CODE <= 2129)) OR
+      ((PRDEFTAB.DF_CODE >= 2430) AND
+      (PRDEFTAB.DF_CODE <= 2439)))
+AND (PERSONALINFO.PRS_BR = BRANCH.BR_KEY)
+and DF_DESC in ('*ลืมบันทึกเวลาออกงาน',  '*ลืมบันทึกเวลาเข้างาน' )
+and  TMR_DATE = dateadd(day,-1,CONVERT(date, GETDATE()) )
+
+union all
+
+SELECT--แก้ไขโปรเเกรม ลืมตรอกบัตร 14 มค 21
+ '' as TMR_QTY_T, '' as SF_CODE,'' as  SF_NAME,'' as DF_CODE
+ ,case when TMM_STAMP_1 is null then 'ลืมตรอกบัตรเข้า' when TMM_STAMP_2 IS null then 'ลืมตรอกบัตรออก' else 'ลืมตรอกบัตร'end as DF_DESC
+ , PRS_NO, BR_THAIDESC, DEPT_CODE, DEPT_THAIDESC, EMP_INTL, EMP_NAME, EMP_SURNME, TMM_DATE, BR_CODE
+ ,'' as  SF_IN_DAY, TMM_STAMP_1 as SF_IN_TIME
+,EMP_KEY,EMP_EMAIL,replace(EMP_TEL,'-','') as EMP_TEL
+FROM
+   EMPFILE,
+   PERSONALINFO,
+   PAYROLLINFO,
+   DEPTTAB,
+   TMSTAMP,
+BRANCH
+WHERE
+   (EMPFILE.EMP_KEY = PERSONALINFO.PRS_EMP) AND
+   (EMPFILE.EMP_KEY = PAYROLLINFO.PRI_EMP) AND
+   (PERSONALINFO.PRS_DEPT = DEPTTAB.DEPT_KEY)  AND
+   (EMPFILE.EMP_KEY = TMSTAMP.TMM_EMP) AND
+  (PERSONALINFO.PRS_BR = BRANCH.BR_KEY)
+  
+ and  TMM_DATE = dateadd(day,-1,CONVERT(date, GETDATE()) ) 
+--AND (TMM_DATE >= '01/01/2021') AND (TMM_DATE <= '01/14/2021')
+and (TMM_STAMP_1 is null Or TMM_STAMP_2 is null)
+
+union all 
+
+
+SELECT 
+'' as TMR_QTY_T,BR_CODE as  SF_CODE,DATA3RD_LC_NAME as  SF_NAME,'' as  DF_CODE
+,'ลืมตรอกบัตรผ่านมือถือ'  as DF_DESC
+, PRS_NO, BR_THAIDESC, DEPT_CODE, DEPT_THAIDESC, EMP_INTL, EMP_NAME, EMP_SURNME
+,DATA3RD_DATE as  TMR_DATE, BR_CODE,'' as  SF_IN_DAY,Data3rd_datetime as SF_IN_TIME
+,EMP_KEY,EMP_EMAIL,replace(EMP_TEL,'-','') as EMP_TEL
+
+FROM   DATA3RDPARTY 
+JOIN EMPFILE ON EMP_NOTI_ID = DATA3RD_ID
+                              JOIN PERSONALINFO ON PRS_EMP = EMP_KEY
+		       JOIN BRANCH ON PRS_BR = BR_KEY
+		       JOIN DEPTTAB ON PRS_DEPT = DEPT_KEY
+
+WHERE (DATA3RD_RQST_CODE = 102 OR DATA3RD_RQST_CODE = 809)
+--AND (DATA3RD_DATE = '01/13/2021')--ก้อนนี้ดูได้ทีล่ะวัน
+ and  DATA3RD_DATE = dateadd(day,-1,CONVERT(date, GETDATE()) ) 
+and PRS_NO not in (  -- ถ้าสแกนเกิน 1 ครั้งคือไม่ลืมตรอกบัตรผ่านมือถือแน่ๆ  เอา count มากกว่า 1 ออกไป
+	  select distinct PRS_NO
+	  --,count(PRS_NO) as PRS_NO_count,DATA3RD_DATE
+	  FROM   DATA3RDPARTY 
+	JOIN EMPFILE ON EMP_NOTI_ID = DATA3RD_ID
+	JOIN PERSONALINFO ON PRS_EMP = EMP_KEY
+				   JOIN BRANCH ON PRS_BR = BR_KEY
+				   JOIN DEPTTAB ON PRS_DEPT = DEPT_KEY
+				   join EMPFILE EF on PRS_EMP = EF.EMP_KEY
+	WHERE (DATA3RD_RQST_CODE = 102 OR DATA3RD_RQST_CODE = 809)
+	--AND (DATA3RD_DATE = '01/13/2021')
+	and  DATA3RD_DATE = dateadd(day,-1,CONVERT(date, GETDATE()) ) 
+	group by DATA3RD_DATE,PRS_NO
+	having count(PRS_NO) > 1
+--ORDER BY DATA3RD_DATE desc
+)
+
+
+";
+		return sql;
+	}
+
+
+    }
+
