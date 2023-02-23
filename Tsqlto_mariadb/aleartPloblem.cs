@@ -81,11 +81,13 @@ namespace Tsqlto_mariadb
                     cmd.Parameters.AddWithValue("@car_code", row.Cells["CarNo"].Value);
                     cmd.Parameters.AddWithValue("@emp_code", row.Cells["EmployeeCode"].Value);
                     cmd.Parameters.AddWithValue("@distance_km", row.Cells["Distance"].Value);
+                    cmd.Parameters.AddWithValue("@NumberOfMembers", row.Cells["NumberOfMembers"].Value);
+                    cmd.Parameters.AddWithValue("@DeliveryAmount", row.Cells["DeliveryAmount"].Value);
+                  
 
+                    cmd.CommandText = "INSERT INTO driver_delivery_cost.driving_distance(YEAR,MONTH,car_code,emp_code,distance_km,total_member,total_bottle_delivered)" +
+                         "VALUES(@YEAR,@MONTH,@car_code,@emp_code,@distance_km,@NumberOfMembers,@DeliveryAmount)";
 
-                    cmd.CommandText = "INSERT INTO driver_delivery_cost.driving_distance(YEAR,MONTH,car_code,emp_code,distance_km)" +
-                        "VALUES(@YEAR,@MONTH,@car_code,@emp_code,@distance_km)";
-               
                     connection.Open();
                     cmd.ExecuteNonQuery();
                     connection.Close();

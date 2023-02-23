@@ -54,8 +54,12 @@ namespace GoogleSheetsHelper
             dt.Columns.Add("CarNo", typeof(string));
             dt.Columns.Add("FirstName", typeof(string));
             dt.Columns.Add("LastName", typeof(string));
-           // dt.Columns.Add("NumberOfMembers", typeof(string));
-           // dt.Columns.Add("DeliveryAmount", typeof(string));
+
+
+            dt.Columns.Add("NumberOfMembers", typeof(string));
+            dt.Columns.Add("DeliveryAmount", typeof(string));
+
+
             dt.Columns.Add("Distance", typeof(string));
 
             foreach (var row in values)
@@ -63,11 +67,11 @@ namespace GoogleSheetsHelper
                 // insert row values
                 if (row != null)
                 {
-                   // dt.Rows.Add(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7]);
-                   // Console.WriteLine($"{row[0]}, {row[1]}, {row[2]}, {row[3]}, {row[4]}, {row[5]}, {row[6]}, {row[7]}");
+                    dt.Rows.Add(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7]);
+                    Console.WriteLine($"{row[0]}, {row[1]}, {row[2]}, {row[3]}, {row[4]}, {row[5]}, {row[6]}, {row[7]}");
 
-                    dt.Rows.Add(row[0], row[1], row[2], row[3], row[4], row[5]);
-                    Console.WriteLine($"{row[0]}, {row[1]}, {row[2]}, {row[3]}, {row[4]}, {row[5]}");
+                    //dt.Rows.Add(row[0], row[1], row[2], row[3], row[4], row[5]);
+                    //Console.WriteLine($"{row[0]}, {row[1]}, {row[2]}, {row[3]}, {row[4]}, {row[5]}");
                 }
             }
 

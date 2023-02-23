@@ -26,8 +26,6 @@ namespace Tsqlto_mariadb
         private static string SheetName = ConfigurationManager.AppSettings["IsCustomSheetName"].ToString() == "true"
                                             ? ConfigurationManager.AppSettings["SheetName"].ToString()
                                             : $"{DateTime.Now.AddMonths(-1).Year+543}-{DateTime.Now.AddMonths(-1).Month}";
-        //         : $"{DateTime.Now.Year + 543}-{DateTime.Now.Month - 1}";        เต้เปลี่ยน code month ใหม่
-        //ถ้าเป็น true ให้ดึง SheetName ซึ่งฟิกค่าไว้เป็นเดือนสิบ ถ้าเป็น false ให้เอาค่าที่ sheet มา
         private static int RangeColumnStart = Convert.ToInt32(ConfigurationManager.AppSettings["RangeColumnStart"].ToString());
         private static int RangeColumnEnd = Convert.ToInt32(ConfigurationManager.AppSettings["RangeColumnEnd"].ToString());
         private static int RangeRowStart = Convert.ToInt32(ConfigurationManager.AppSettings["RangeRowStart"].ToString());
