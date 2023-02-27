@@ -12,8 +12,10 @@ namespace Tsqlto_mariadb
     static class Program
     {
         //Path        
-        private static string LocalPath = new Uri(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().CodeBase)).LocalPath;
-        private static string LogFilePath = new Uri(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().CodeBase)).LocalPath + @"\LOG\" + "LOG_" + DateTime.Now.ToString("yyyyMMdd", System.Globalization.CultureInfo.GetCultureInfo("en-US")) + ".txt";
+        //private static string LocalPath = new Uri(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().CodeBase)).LocalPath;
+        //private static string LogFilePath = new Uri(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().CodeBase)).LocalPath + @"\LOG\" + "LOG_" + DateTime.Now.ToString("yyyyMMdd", System.Globalization.CultureInfo.GetCultureInfo("en-US")) + ".txt";
+        private static string LocalPath = System.IO.Path.GetDirectoryName(Application.ExecutablePath);
+        private static string LogFilePath = System.IO.Path.GetDirectoryName(Application.ExecutablePath) + @"\LOG\" + "LOG_" + DateTime.Now.ToString("yyyyMMdd", System.Globalization.CultureInfo.GetCultureInfo("en-US")) + ".txt";
 
         //CultureInfo & Encoding
         private static CultureInfo CuInfo = CultureInfo.GetCultureInfo("en-US");
